@@ -1,0 +1,171 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: api.spry-group.com
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /api
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+security:
+  - githubAccessCode:
+    - user
+    - user:email
+    - user:follow
+    - public_repo
+    - repo
+    - repo_deployment
+    - repo:status
+    - delete_repo
+    - notifications
+    - gist
+    - read:repo_hook
+    - write:repo_hook
+    - admin:repo_hook
+    - read:org
+    - write:org
+    - admin:org
+    - read:public_key
+    - write:public_key
+    - admin:public_key
+  - apiKey: []
+paths:
+  /v1/contact:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: contact
+    post:
+      description: Adds a contact request to the database.
+      # used as the method name of the controller
+      operationId: contact
+      parameters:
+        - name: body
+          in: body
+          description: The name of the person to whom to say hello
+          required: true
+          schema:
+            $ref: "#/definitions/ContactRequest"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Message"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+
+  /v1/spotcheck/freshbooks:
+    x-swagger-router-controller: memberPerformance
+    post:
+      description: spotcheck eod data in freshbooks (check everyone's hours and log in mongo with a timestamp).
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Message"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+
+  /v1/spotcheck/github:
+    x-swagger-router-controller: memberPerformance
+    post:
+      description: spotcheck eod data in github (check out issue counts, points closes, etc and log in mongo with a timestamp for reporting).
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Message"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  ContactRequest:
+    required:
+      - email
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      reason:
+        type: string
+      message:
+        type: string
+  ErrorMessage:
+    required:
+      - type
+      - payload
+    properties:
+      type:
+        type: string
+        pattern: "^error.([a-z,.]*)$"
+      payload:
+        type: object
+
+  Message:
+    required:
+      - type
+      - payload
+    properties:
+      type:
+        type: string
+        pattern: "^[a-z,.]*$"
+      payload:
+        type: object
+
+securityDefinitions:
+  githubAccessCode:
+    type: oauth2
+    scopes:
+      user: Grants read/write access to profile info only. Note that this scope includes user:email and user:follow.
+      user:email: Grants read access to a user’s email addresses.
+      user:follow: Grants access to follow or unfollow other users.
+      public_repo: Grants read/write access to code, commit statuses, and deployment statuses for public repositories and organizations.
+      repo: Grants read/write access to code, commit statuses, and deployment statuses for public and private repositories and organizations.
+      repo_deployment: Grants access to deployment statuses for public and private repositories. This scope is only necessary to grant other users or services access to deployment statuses, without granting access to the code.
+      repo:status: Grants read/write access to public and private repository commit statuses. This scope is only necessary to grant other users or services access to private repository commit statuses without granting access to the code.
+      delete_repo: Grants access to delete adminable repositories.
+      notifications: Grants read access to a user’s notifications. repo also provides this access.
+      gist: Grants write access to gists.
+      read:repo_hook: Grants read and ping access to hooks in public or private repositories.
+      write:repo_hook: Grants read, write, and ping access to hooks in public or private repositories.
+      admin:repo_hook: Grants read, write, ping, and delete access to hooks in public or private repositories.
+      read:org: Read-only access to organization, teams, and membership.
+      write:org: Publicize and unpublicize organization membership.
+      admin:org: Fully manage organization, teams, and memberships.
+      read:public_key: List and view details for public keys.
+      write:public_key: Create, list, and view details for public keys.
+      admin:public_key: Fully manage public keys.
+    flow: accessCode
+    authorizationUrl: https://github.com/login/oauth/authorize
+    tokenUrl: https://github.com/login/oauth/access_token
+  apiKey:
+    type: "apiKey"
+    in: "header"
+    name: "Authorization"

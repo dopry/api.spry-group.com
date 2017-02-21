@@ -1,0 +1,15 @@
+# provide supporting services to run the api locally.
+
+version: '2'
+services:
+  # used to store user data and claims.
+  mongo:
+    image: mvertes/alpine-mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - private
+
+networks:
+  private:
+  public:

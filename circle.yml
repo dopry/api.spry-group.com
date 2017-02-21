@@ -1,0 +1,23 @@
+---
+machine:
+   node:
+      version: 6.9.5
+test:
+  override:
+    - ./node_modules/.bin/istanbul cover -x "**/*.spec.js" ./node_modules/mocha/bin/_mocha -- src/**/*.spec.js src/*.spec.js --reporter mocha-junit-reporter:
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+  post:
+    - bash <(curl -s https://codecov.io/bash) -t 663baa9e-fbc8-41b2-b61a-3aed34cb020f
+notify:
+   webhooks:
+      - url: https://webhooks.gitter.im/e/14884cbbcd1070cc327c
+
+deployment:
+  # initially we're only deploying master without
+  # dev or staging releases, so make sure you're testing properly.
+  master:
+    branch: master
+    commands:
+      # deploy to modulus.
+      - ./node_modules/.bin/xervo deploy -p api.spry-group.com

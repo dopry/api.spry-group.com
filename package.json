@@ -1,0 +1,33 @@
+{
+  "name": "api.spry-group.com",
+  "description": "API for Spry Groups's operations and automation.",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha src/**/*.spec.js src/*.spec.js",
+    "test-watch": "./node_modules/.bin/mocha --watch src/**/*.spec.js src/*.spec.js",
+    "test-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- src/**/*.spec.js src/*.spec.js --reporter mocha-junit-reporter"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "eslint": "^2.2.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
+    "mocha-junit-reporter": "^1.12.1",
+    "supertest": "^2.0.1"
+  },
+  "dependencies": {
+    "@xervo/cli": "^7.0.0",
+    "body-parser": "^1.15.2",
+    "compression": "^1.6.2",
+    "cors": "^2.8.1",
+    "es6-error": "^4.0.1",
+    "express": "^4.14.0",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.3",
+    "sparkpost": "^2.1.0",
+    "stripe": "^4.14.0",
+    "validator": "^6.2.1"
+  }
+}
